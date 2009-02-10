@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="agentinfo" default="all">
+  
+  
+  <property file="agentinfo.properties"/>
+  <!-- Uncomment the following property if no tests compilation is needed -->
+  <!-- 
+  <property name="skip.tests" value="true"/>
+   -->
+  
+  <!-- Compiler options -->
+  
+  <property name="compiler.debug" value="on"/>
+  <property name="compiler.generate.no.warnings" value="off"/>
+  <property name="compiler.args" value=""/>
+  <property name="compiler.max.memory" value="128m"/>
+  <patternset id="ignored.files">
+    <exclude name="**/CVS/**"/>
+    <exclude name="**/SCCS/**"/>
+    <exclude name="**/RCS/**"/>
+    <exclude name="**/rcs/**"/>
+    <exclude name="**/.DS_Store/**"/>
+    <exclude name="**/.svn/**"/>
+    <exclude name="**/.sbas/**"/>
+    <exclude name="**/.IJI.*/**"/>
+    <exclude name="**/vssver.scc/**"/>
+    <exclude name="**/vssver2.scc/**"/>
+    <exclude name="**/.pyc/**"/>
+    <exclude name="**/.pyo/**"/>
+    <exclude name="**/*.pyc/**"/>
+    <exclude name="**/*.pyo/**"/>
+    <exclude name="**/.git/**"/>
+  </patternset>
+  <patternset id="library.patterns">
+    <include name="*.zip"/>
+    <include name="*.war"/>
+    <include name="*.egg"/>
+    <include name="*.ear"/>
+    <include name="*.swc"/>
+    <include name="*.jar"/>
+  </patternset>
+  <patternset id="compiler.resources">
+    <include name="**/?*.properties"/>
+    <include name="**/?*.xml"/>
+    <include name="**/?*.gif"/>
+    <include name="**/?*.png"/>
+    <include name="**/?*.jpeg"/>
+    <include name="**/?*.jpg"/>
+    <include name="**/?*.html"/>
+    <include name="**/?*.dtd"/>
+    <include name="**/?*.tld"/>
+    <include name="**/?*.ftl"/>
+    <include name="**/?*.groovy"/>
+  </patternset>
+  
+  
+  <!-- Project Libraries -->
+  
+  <path id="library.jniwrapper.classpath">
+    <pathelement location="C:/Work/TeamCity4.0/buildAgent/lib/jniwrap-3.6.1.jar"/>
+    <pathelement location="C:/Work/TeamCity4.0/buildAgent/lib/winpack.jar"/>
+  </path>
+  
+  <path id="library.teamcity_open_api_agent.classpath">
+    <pathelement location="${path.variable.teamcitydistribution}/devPackage/agent-api.jar"/>
+  </path>
+  
+  <path id="library.teamcity_open_api_common.classpath">
+    <pathelement location="${path.variable.teamcitydistribution}/devPackage/common-api.jar"/>
+    <pathelement location="${path.variable.teamcitydistribution}/devPackage/runtime-util.jar"/>
+  </path>
+  
+  <path id="library.teamcity_third-party.classpath">
+    <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/annotations.jar"/>
+    <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/openapi.jar"/>
+    <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/spring-webmvc.jar"/>
+    <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/spring.jar"/>
+    <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/util.jar"/>
+  </path>
+  
+  
+  <!-- Application Server Libraries -->
+  
+  <!-- Modules -->
+  
+  
+  <!-- Module AgentInfo -->
+  
+  <dirname property="module.agentinfo.basedir" file="${ant.file}"/>
+  
+  
+  
+  <property name="compiler.args.agentinfo" value="${compiler.args}"/>
+  
+  <property name="agentinfo.output.dir" value="${module.agentinfo.basedir}/out/production/AgentInfo"/>
+  <property name="agentinfo.testoutput.dir" value="${module.agentinfo.basedir}/out/test/AgentInfo"/>
+  
+  <path id="agentinfo.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="agentinfo.module.classpath">
+    <path refid="library.teamcity_open_api_common.classpath"/>
+    <path refid="library.teamcity_third-party.classpath"/>
+    <path refid="library.teamcity_open_api_agent.classpath"/>
+    <path refid="library.jniwrapper.classpath"/>
+  </path>
+  
+  <path id="agentinfo.runtime.module.classpath">
+    <pathelement location="${agentinfo.output.dir}"/>
+    <pathelement location="${agentinfo.testoutput.dir}"/>
+    <path refid="library.teamcity_open_api_common.classpath"/>
+    <path refid="library.teamcity_third-party.classpath"/>
+    <path refid="library.teamcity_open_api_agent.classpath"/>
+    <path refid="library.jniwrapper.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.agentinfo">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.agentinfo">
+    <patternset refid="excluded.from.module.agentinfo"/>
+  </patternset>
+  
+  <path id="agentinfo.module.sourcepath">
+    <dirset dir="${module.agentinfo.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.agentinfo" depends="compile.module.agentinfo.production,compile.module.agentinfo.tests" description="Compile module AgentInfo"/>
+  
+  <target name="compile.module.agentinfo.production" description="Compile module AgentInfo; production classes">
+    <mkdir dir="${agentinfo.output.dir}"/>
+    <javac destdir="${agentinfo.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true">
+      <compilerarg line="${compiler.args.agentinfo}"/>
+      <bootclasspath refid="agentinfo.module.bootclasspath"/>
+      <classpath refid="agentinfo.module.classpath"/>
+      <src refid="agentinfo.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.agentinfo"/>
+    </javac>
+    
+    <copy todir="${agentinfo.output.dir}">
+      <fileset dir="${module.agentinfo.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.agentinfo.tests" depends="compile.module.agentinfo.production" description="compile module AgentInfo; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.agentinfo" description="cleanup module">
+    <delete dir="${agentinfo.output.dir}"/>
+    <delete dir="${agentinfo.testoutput.dir}"/>
+  </target>
+  
+  <target name="init" description="Build initialization">
+    <!-- Perform any build initialization in this target -->
+  </target>
+  
+  <target name="clean" depends="clean.module.agentinfo" description="cleanup all"/>
+  
+  <target name="all" depends="init, clean, compile.module.agentinfo" description="build all"/>
+</project>

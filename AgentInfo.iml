@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module relativePaths="true" type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="Spring" name="Spring">
+      <configuration>
+        <fileset id="fileset1" name="My Fileset" removed="false">
+          <dependency>fileset2</dependency>
+          <file>file://$MODULE_DIR$/src/META-INF/build-agent-plugin-agentInfo.xml</file>
+        </fileset>
+        <fileset id="fileset2" name="TeamCity main Spring config" removed="false">
+          <file>jar://$TeamCityDistribution$/webapps/ROOT/WEB-INF/lib/server.jar!/META-INF/buildServerSpring.xml</file>
+        </fileset>
+      </configuration>
+    </facet>
+  </component>
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/temp" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="TeamCity Open API common" level="project" />
+    <orderEntry type="library" name="TeamCity Third-Party" level="project" />
+    <orderEntry type="library" name="TeamCity Open API agent" level="project" />
+    <orderEntry type="library" name="JNIWrapper" level="project" />
+  </component>
+</module>
+

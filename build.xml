@@ -1,0 +1,104 @@
+<project name="agentinfo-custom-build" default="dist" basedir=".">
+
+  <property name="plugin.name" value="agentInfo"/>
+
+  <property file="build.properties"/>
+
+  <import file="agentinfo.xml"/>
+
+  <property name="dist" value="dist"/>
+  <property name="dist_unpacked" value="${dist}/unpacked"/>
+  <property name="distrib_prep" value="${basedir}/temp/dist_prep"/>
+  <property name="distrib_prep_server" value="${distrib_prep}/server"/>
+  <property name="distrib_prep_agent" value="${distrib_prep}/agent"/>
+  <property name="distrib_prep_agent_jars" value="${distrib_prep_agent}/unpacked"/>
+
+  <target name="build.jar" depends="all">
+    <delete dir="${dist_unpacked}" quiet="true"/>
+    <delete dir="${distrib_prep}" quiet="true"/>
+
+    <mkdir dir="${dist}"/>
+    <mkdir dir="${dist_unpacked}"/>
+
+    <!-- server part -->
+<!--
+    <mkdir dir="${distrib_prep_server}"/>
+
+    <copydir src="${agentinfo.output.dir}" dest="${distrib_prep_server}"/>
+    <copy todir="${distrib_prep_server}/buildServerResources" failonerror="false">
+      <fileset dir="${basedir}/buildServerResources"/>
+    </copy>
+
+    <jar destfile="${dist_unpacked}/${plugin.name}.jar">
+      <fileset dir="${distrib_prep_server}"/>
+    </jar>
+-->
+
+    <!-- agent part -->
+    <delete dir="${dist}/agent" quiet="true"/>
+    <mkdir dir="${distrib_prep_agent}"/>
+    <mkdir dir="${distrib_prep_agent_jars}/${plugin.name}/lib"/>
+    <mkdir dir="${dist_unpacked}/agent"/>
+
+    <jar destfile="${distrib_prep_agent_jars}/${plugin.name}/lib/${plugin.name}.jar">
+      <fileset dir="${agentinfo.output.dir}"/>
+    </jar>
+
+    <zip destfile="${dist_unpacked}/agent/${plugin.name}.zip">
+      <fileset dir="${distrib_prep_agent_jars}"/>
+    </zip>
+
+
+    <delete dir="${distrib_prep}" quiet="true"/>
+  </target>
+
+  <target name="package" depends="check, build.jar">
+    <delete file="${dist}/${plugin.name}.zip" quiet="true"/>
+    <zip destfile="${dist}/${plugin.name}.zip">
+      <fileset dir="${dist_unpacked}"/>
+    </zip>
+    <echo message="To install the plugin, place '${dist}\${plugin.name}.zip' into '.BuildServer/plugins' directory"/>
+    <echo message="also, copy files from 'application_libs' into '&lt;TeamCity home&gt;/webapps/ROOT/WEB-INF/lib' directory"/>
+  </target>
+
+  <target name="dist" depends="check,all,package"/>
+
+  <target name="check">
+    <condition property="not.configured">
+      <not>
+        <and>
+          <isset property="path.variable.teamcitydistribution"/>
+          <length string="${path.variable.teamcitydistribution}" when="greater" length="0"/>
+          <available file="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib"/>
+        </and>
+      </not>
+    </condition>
+    <fail if="not.configured"
+          message="Please define 'path.variable.teamcitydistribution' property in build.properties file. The property should point to unpacked TeamCity .tar.gz or .exe distribution."/>
+  </target>
+
+  <!-- TeamCity distribution unpacking -->
+  <target name="teamcity_unpack">
+
+    <property name="distribution.dir" value="${basedir}/teamcity-dist"/>
+    <property name="teamcity.tar.gz-location" value="."/>
+
+    <delete dir="${distribution.dir}" quiet="true"/>
+    <mkdir dir="${distribution.dir}"/>
+
+    <untar compression="gzip" dest="${distribution.dir}">
+      <fileset dir="${teamcity.tar.gz-location}">
+        <include name="*.tar.gz"/>
+      </fileset>
+    </untar>
+
+    <move todir="${distribution.dir}">
+      <fileset dir="${distribution.dir}\TeamCity">
+        <include name="**"/>
+      </fileset>
+    </move>
+  </target>
+
+</project>
+
+        
