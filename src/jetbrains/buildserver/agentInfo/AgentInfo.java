@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class AgentInfo extends AgentLifeCycleAdapter {
   @NotNull private final BuildAgentConfiguration myConfig;
+  private static final long MB = 1024L * 1024L;
 
   public AgentInfo(@NotNull final BuildAgentConfiguration config,
                    @NotNull final BuildAgent agent,
@@ -58,9 +59,10 @@ public class AgentInfo extends AgentLifeCycleAdapter {
     final OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
     if (operatingSystemMXBean instanceof com.sun.management.OperatingSystemMXBean) {
       com.sun.management.OperatingSystemMXBean sunBean = ((com.sun.management.OperatingSystemMXBean)operatingSystemMXBean);
-      long myPhysicalMemoryInMb = sunBean.getTotalPhysicalMemorySize() / (1024L * 1024L);
+
+      long myPhysicalMemoryInMb = sunBean.getTotalPhysicalMemorySize() / MB;
       if (myPhysicalMemoryInMb > 0){
-        myConfig.addConfigurationParameter("teamcity.agent.hardware.memorySize", String.valueOf(myPhysicalMemoryInMb));
+        myConfig.addConfigurationParameter("teamcity.agent.hardware.memorySizeMb", String.valueOf(myPhysicalMemoryInMb));
       }
     }
 
@@ -74,7 +76,8 @@ public class AgentInfo extends AgentLifeCycleAdapter {
   private void publishFreeSpace() {
     final Long space = FileUtil.getFreeSpace(myConfig.getWorkDirectory());
     if (space != null && space >= 0) {
-      myConfig.addConfigurationParameter("teamcity.agent.work.dir.freeSpaceBytes", space.toString());
+      final long sizeMb = space / MB;
+      myConfig.addConfigurationParameter("teamcity.agent.work.dir.freeSpaceMb", String.valueOf(sizeMb));
     }
   }
 
