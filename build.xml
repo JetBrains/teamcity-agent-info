@@ -21,18 +21,28 @@
     <mkdir dir="${dist_unpacked}"/>
 
     <!-- server part -->
-<!--
-    <mkdir dir="${distrib_prep_server}"/>
+    <echo message="replacing tokens in teamcity-plugin.xml file under ${dist_unpacked}"/>
 
-    <copydir src="${agentinfo.output.dir}" dest="${distrib_prep_server}"/>
-    <copy todir="${distrib_prep_server}/buildServerResources" failonerror="false">
-      <fileset dir="${basedir}/buildServerResources"/>
-    </copy>
+    <tstamp>
+       <format property="snapshot" pattern="yyyy-dd-MM-HH-mm-ss"/>
+    </tstamp>
+    <condition property="build.number" value="snapshot-${snapshot}" else="${build.number}">
+      <not>
+        <isset property="build.number"/>
+      </not>
+    </condition>
 
-    <jar destfile="${dist_unpacked}/${plugin.name}.jar">
-      <fileset dir="${distrib_prep_server}"/>
-    </jar>
--->
+    <echo message="Setting version to: ${build.number}"/>
+    <!-- update all references in teamcity-plugin.xml files -->
+    <copy file="${basedir}/teamcity-server-plugin.xml" tofile="${dist_unpacked}/teamcity-plugin.xml"/>
+
+    <replace dir="${dist_unpacked}" summary="true">
+      <include name="**/teamcity-plugin.xml"/>
+
+      <replacefilter token="@Plugin_Version@" value="${build.number}"/>
+      <replacefilter token="@Plugin_Vendor@" value="JetBrains, s.r.o."/>
+      <replacefilter token="@Plugin_Vendor_Url@" value="http://www.jetbrains.com"/>
+    </replace>
 
     <!-- agent part -->
     <delete dir="${dist}/agent" quiet="true"/>
