@@ -2,9 +2,10 @@
 <teamcity-plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                  xsi:noNamespaceSchemaLocation="urn:shemas-jetbrains-com:teamcity-plugin-v1-xml">
   <info>
-    <name>agent-info</name>
-    <display-name>Agent Info</display-name>
+    <name>agent-system-info</name>
+    <display-name>Agent System Info</display-name>
     <version>@Plugin_Version@</version>
+    <description>Provides agent system information</description>
     <vendor>
       <name>@Plugin_Vendor@</name>
       <url>@Plugin_Vendor_Url@</url>

@@ -1,6 +1,6 @@
 <project name="agentinfo-custom-build" default="dist" basedir=".">
 
-  <property name="plugin.name" value="agentInfo"/>
+  <property name="plugin.name" value="agentSystemInfo"/>
 
   <property file="build.properties"/>
 
