@@ -1,10 +1,8 @@
 package jetbrains.buildserver.agentInfo;
 
+import com.intellij.openapi.diagnostic.Logger;
 import jetbrains.buildServer.agent.*;
-import jetbrains.buildServer.util.EventDispatcher;
-import jetbrains.buildServer.util.ExceptionUtil;
-import jetbrains.buildServer.util.FileUtil;
-import jetbrains.buildServer.util.NamedDeamonThreadFactory;
+import jetbrains.buildServer.util.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.management.ManagementFactory;
@@ -18,6 +16,10 @@ import java.util.concurrent.TimeUnit;
  *         Date: 10.02.2009
  */
 public class AgentInfo extends AgentLifeCycleAdapter {
+  private static final String FREE_SPACE_REFRESH_TIMEOUT = "teamcity.agent.recalculate.disk.free.space";
+
+  private static final Logger LOG = Logger.getInstance(AgentInfo.class.getName());
+
   @NotNull private final BuildAgentConfiguration myConfig;
   private static final long MB = 1024L * 1024L;
 
@@ -40,7 +42,7 @@ public class AgentInfo extends AgentLifeCycleAdapter {
       public void pluginsLoaded() {
         publishStaticParameters();
 
-        service.scheduleWithFixedDelay(action, 0, 5 * 60, TimeUnit.SECONDS);
+        service.scheduleWithFixedDelay(action, 0, parseRefreshTimeout(), TimeUnit.SECONDS);
       }
 
       @Override
@@ -54,7 +56,26 @@ public class AgentInfo extends AgentLifeCycleAdapter {
       }
     });
   }
-  
+
+  private long parseRefreshTimeout() {
+    final long defaultTimeout = 30 * 60;
+    try {
+      final String value = myConfig.getConfigurationParameters().get(FREE_SPACE_REFRESH_TIMEOUT);
+      if (StringUtil.isEmptyOrSpaces(value)) {
+        return defaultTimeout;
+      }
+      int newTime = Integer.parseInt(value.trim());
+      if (newTime > 0) {
+        return newTime;
+      } else {
+        throw new RuntimeException("Value must be > 0");
+      }
+    } catch(Exception e) {
+      LOG.warn("Failed to parse " + FREE_SPACE_REFRESH_TIMEOUT + " parameter value. Default value will be used.");
+      return defaultTimeout;
+    }
+  }
+
   private void publishStaticParameters() {
     final OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
     if (operatingSystemMXBean instanceof com.sun.management.OperatingSystemMXBean) {
