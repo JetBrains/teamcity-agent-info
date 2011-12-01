@@ -4,6 +4,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import jetbrains.buildServer.agent.*;
 import jetbrains.buildServer.util.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
@@ -22,6 +23,9 @@ public class AgentInfo extends AgentLifeCycleAdapter {
 
   @NotNull private final BuildAgentConfiguration myConfig;
   private static final long MB = 1024L * 1024L;
+  private static final String PHYSICAL_MEMORY_KEY = "teamcity.agent.hardware.memorySizeMb";
+  private static final String PROCESSORS_COUNT_KEY = "teamcity.agent.hardware.cpuCount";
+  private static final String FREE_SPACE_KEY = "teamcity.agent.work.dir.freeSpaceMb";
 
   public AgentInfo(@NotNull final BuildAgentConfiguration config,
                    @NotNull final BuildAgent agent,
@@ -76,29 +80,53 @@ public class AgentInfo extends AgentLifeCycleAdapter {
     }
   }
 
-  private void publishStaticParameters() {
+
+  @Nullable
+  private Long getPhysicalMemorySizeMB() {
     final OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
     if (operatingSystemMXBean instanceof com.sun.management.OperatingSystemMXBean) {
       com.sun.management.OperatingSystemMXBean sunBean = ((com.sun.management.OperatingSystemMXBean)operatingSystemMXBean);
 
       long myPhysicalMemoryInMb = sunBean.getTotalPhysicalMemorySize() / MB;
       if (myPhysicalMemoryInMb > 0){
-        myConfig.addConfigurationParameter("teamcity.agent.hardware.memorySizeMb", String.valueOf(myPhysicalMemoryInMb));
+        return myPhysicalMemoryInMb;
       }
     }
-
-    long myAvailableProcessors = operatingSystemMXBean.getAvailableProcessors();
-    if (myAvailableProcessors > 0){
-      myConfig.addConfigurationParameter("teamcity.agent.hardware.cpuCount", String.valueOf(myAvailableProcessors));
-    }
+    return null;
   }
 
+  private Long getProcessorsCount() {
+    final OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
+    long myAvailableProcessors = operatingSystemMXBean.getAvailableProcessors();
+    if (myAvailableProcessors > 0){
+      return myAvailableProcessors;
+    }
+    return null;
+  }
+
+  private void publishStaticParameters() {
+    final Long physicalMemorySizeMB = getPhysicalMemorySizeMB();
+    if (physicalMemorySizeMB != null) {
+      myConfig.addConfigurationParameter(PHYSICAL_MEMORY_KEY, String.valueOf(physicalMemorySizeMB));
+    } else {
+      LOG.warn("Failed to detect physical memory size. Property " + PHYSICAL_MEMORY_KEY + " will not be set");
+    }
+
+    final Long processorsCount = getProcessorsCount();
+    if (processorsCount != null) {
+      myConfig.addConfigurationParameter(PROCESSORS_COUNT_KEY, String.valueOf(processorsCount));
+    } else {
+      LOG.warn("Failed to detect number of processors. Property " + PROCESSORS_COUNT_KEY + " will not be set");
+    }
+  }
 
   private void publishFreeSpace() {
     final Long space = FileUtil.getFreeSpace(myConfig.getWorkDirectory());
     if (space != null && space >= 0) {
       final long sizeMb = space / MB;
-      myConfig.addConfigurationParameter("teamcity.agent.work.dir.freeSpaceMb", String.valueOf(sizeMb));
+      myConfig.addConfigurationParameter(FREE_SPACE_KEY, String.valueOf(sizeMb));
+    } else {
+      LOG.debug("Failed to detect number of processors. Property " + FREE_SPACE_KEY + " will not be set");
     }
   }
 
