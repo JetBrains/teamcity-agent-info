@@ -16,10 +16,10 @@ import java.util.concurrent.TimeUnit;
  * @author Yegor.Yarko
  *         Date: 10.02.2009
  */
-public class AgentInfo extends AgentLifeCycleAdapter {
+public class AgentSystemInfo extends AgentLifeCycleAdapter {
   private static final String FREE_SPACE_REFRESH_TIMEOUT = "teamcity.agent.recalculate.disk.free.space";
 
-  private static final Logger LOG = Logger.getInstance(AgentInfo.class.getName());
+  private static final Logger LOG = Logger.getInstance(AgentSystemInfo.class.getName());
 
   @NotNull private final BuildAgentConfiguration myConfig;
   private static final long MB = 1024L * 1024L;
@@ -27,7 +27,7 @@ public class AgentInfo extends AgentLifeCycleAdapter {
   private static final String PROCESSORS_COUNT_KEY = "teamcity.agent.hardware.cpuCount";
   private static final String FREE_SPACE_KEY = "teamcity.agent.work.dir.freeSpaceMb";
 
-  public AgentInfo(@NotNull final BuildAgentConfiguration config,
+  public AgentSystemInfo(@NotNull final BuildAgentConfiguration config,
                    @NotNull final BuildAgent agent,
                    @NotNull final EventDispatcher<AgentLifeCycleListener> events) {
     myConfig = config;

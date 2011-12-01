@@ -8,5 +8,5 @@
                            http://www.springframework.org/schema/lang/spring-lang-2.0.xsd"
        default-autowire="constructor">
 
-  <bean class="jetbrains.buildserver.agentInfo.AgentInfo"/>
+  <bean class="jetbrains.buildserver.agentInfo.AgentSystemInfo"/>
 </beans>
