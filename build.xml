@@ -14,6 +14,8 @@
   <property name="distrib_prep_agent_jars" value="${distrib_prep_agent}/unpacked"/>
 
   <target name="build.jar" depends="all">
+    <delete dir="${dist}" quiet="true"/>
+
     <delete dir="${dist_unpacked}" quiet="true"/>
     <delete dir="${distrib_prep}" quiet="true"/>
 
