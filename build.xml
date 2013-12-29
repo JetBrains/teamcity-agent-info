@@ -111,6 +111,13 @@
     </move>
   </target>
 
+  <target name="test" depends="compile.module.agentinfo.tests" description="Run tests">
+    <taskdef name="testng" classpathref="agentinfo.runtime.module.classpath" classname="org.testng.TestNGAntTask"/>
+    <testng classpathref="agentinfo.runtime.module.classpath" haltonfailure="true">
+      <classfileset dir="${agentinfo.testoutput.dir}" includes="**/*.class" />
+    </testng>
+  </target>
+
 </project>
 
         

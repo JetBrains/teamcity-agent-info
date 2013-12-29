@@ -1,6 +1,7 @@
 package jetbrains.buildserver.agentInfo;
 
 import com.intellij.openapi.diagnostic.Logger;
+import javax.management.*;
 import jetbrains.buildServer.agent.*;
 import jetbrains.buildServer.util.*;
 import org.jetbrains.annotations.NotNull;
@@ -82,14 +83,28 @@ public class AgentSystemInfo extends AgentLifeCycleAdapter {
 
 
   @Nullable
-  private Long getPhysicalMemorySizeMB() {
-    final OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
-    if (operatingSystemMXBean instanceof com.sun.management.OperatingSystemMXBean) {
-      com.sun.management.OperatingSystemMXBean sunBean = ((com.sun.management.OperatingSystemMXBean)operatingSystemMXBean);
+  Long getPhysicalMemorySizeMB() {
+    try {
+      final OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
+      if (operatingSystemMXBean instanceof com.sun.management.OperatingSystemMXBean) {
+        com.sun.management.OperatingSystemMXBean sunBean = ((com.sun.management.OperatingSystemMXBean)operatingSystemMXBean);
 
-      long myPhysicalMemoryInMb = sunBean.getTotalPhysicalMemorySize() / MB;
-      if (myPhysicalMemoryInMb > 0){
-        return myPhysicalMemoryInMb;
+        long myPhysicalMemoryInMb = sunBean.getTotalPhysicalMemorySize() / MB;
+        if (myPhysicalMemoryInMb > 0) {
+          return myPhysicalMemoryInMb;
+        }
+      }
+    } catch (Exception e) {
+      LOG.info("Class 'com.sun.management.OperatingSystemMXBean' not found or another error, using alternative way to get total memory.");
+      try {
+        MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
+        Object attribute = mBeanServer.getAttribute(new ObjectName("java.lang","type","OperatingSystem"), "TotalPhysicalMemorySize");
+        long myPhysicalMemoryInMb = (Long)attribute / MB;
+        if (myPhysicalMemoryInMb > 0) {
+          return myPhysicalMemoryInMb;
+        }
+      } catch (Exception e1) {
+        LOG.warn("Failed to get total memory size: " + e1.toString());
       }
     }
     return null;
@@ -101,6 +116,7 @@ public class AgentSystemInfo extends AgentLifeCycleAdapter {
     if (myAvailableProcessors > 0){
       return myAvailableProcessors;
     }
+    LOG.warn("Failed to get CPU count.");
     return null;
   }
 

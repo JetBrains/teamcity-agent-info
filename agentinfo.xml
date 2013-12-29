@@ -18,7 +18,6 @@
     <exclude name="**/CVS/**"/>
     <exclude name="**/SCCS/**"/>
     <exclude name="**/RCS/**"/>
-    <exclude name="**/rcs/**"/>
     <exclude name="**/.DS_Store/**"/>
     <exclude name="**/.svn/**"/>
     <exclude name="**/.sbas/**"/>
@@ -30,13 +29,24 @@
     <exclude name="**/*.pyc/**"/>
     <exclude name="**/*.pyo/**"/>
     <exclude name="**/.git/**"/>
+    <exclude name="**/*.hprof/**"/>
+    <exclude name="**/_svn/**"/>
+    <exclude name="**/.hg/**"/>
+    <exclude name="**/*.lib/**"/>
+    <exclude name="**/*~/**"/>
+    <exclude name="**/__pycache__/**"/>
+    <exclude name="**/.bundle/**"/>
+    <exclude name="**/*.orig/**"/>
+    <exclude name="**/*.rbc/**"/>
   </patternset>
   <patternset id="library.patterns">
-    <include name="*.zip"/>
     <include name="*.war"/>
-    <include name="*.egg"/>
     <include name="*.ear"/>
+    <include name="*.apk"/>
+    <include name="*.zip"/>
     <include name="*.swc"/>
+    <include name="*.ane"/>
+    <include name="*.egg"/>
     <include name="*.jar"/>
   </patternset>
   <patternset id="compiler.resources">
@@ -56,18 +66,12 @@
   
   <!-- Project Libraries -->
   
-  <path id="library.jniwrapper.classpath">
-    <pathelement location="C:/Work/TeamCity4.0/buildAgent/lib/jniwrap-3.6.1.jar"/>
-    <pathelement location="C:/Work/TeamCity4.0/buildAgent/lib/winpack.jar"/>
-  </path>
-  
   <path id="library.teamcity_open_api_agent.classpath">
     <pathelement location="${path.variable.teamcitydistribution}/devPackage/agent-api.jar"/>
   </path>
   
   <path id="library.teamcity_open_api_common.classpath">
     <pathelement location="${path.variable.teamcitydistribution}/devPackage/common-api.jar"/>
-    <pathelement location="${path.variable.teamcitydistribution}/devPackage/runtime-util.jar"/>
   </path>
   
   <path id="library.teamcity_third-party.classpath">
@@ -90,7 +94,7 @@
   
   
   
-  <property name="compiler.args.agentinfo" value="${compiler.args}"/>
+  <property name="compiler.args.agentinfo" value="-encoding windows-1251 -source 1.5 ${compiler.args}"/>
   
   <property name="agentinfo.output.dir" value="${module.agentinfo.basedir}/out/production/AgentInfo"/>
   <property name="agentinfo.testoutput.dir" value="${module.agentinfo.basedir}/out/test/AgentInfo"/>
@@ -99,20 +103,46 @@
     <!-- Paths to be included in compilation bootclasspath -->
   </path>
   
-  <path id="agentinfo.module.classpath">
+  <path id="agentinfo.module.production.classpath">
     <path refid="library.teamcity_open_api_common.classpath"/>
     <path refid="library.teamcity_third-party.classpath"/>
     <path refid="library.teamcity_open_api_agent.classpath"/>
-    <path refid="library.jniwrapper.classpath"/>
+  </path>
+  
+  <path id="agentinfo.runtime.production.module.classpath">
+    <pathelement location="${agentinfo.output.dir}"/>
+    <path refid="library.teamcity_open_api_common.classpath"/>
+    <path refid="library.teamcity_third-party.classpath"/>
+    <path refid="library.teamcity_open_api_agent.classpath"/>
+  </path>
+  
+  <path id="agentinfo.module.classpath">
+    <pathelement location="${agentinfo.output.dir}"/>
+    <path refid="library.teamcity_open_api_common.classpath"/>
+    <path refid="library.teamcity_third-party.classpath"/>
+    <path refid="library.teamcity_open_api_agent.classpath"/>
+    <fileset dir="${path.variable.teamcitydistribution}/devPackage/tests">
+      <patternset refid="library.patterns"/>
+    </fileset>
+    <fileset dir="${path.variable.teamcitydistribution}/buildAgent/lib">
+      <patternset refid="library.patterns"/>
+    </fileset>
+    <pathelement location="${basedir}/lib-test/testng-6.8.jar"/>
   </path>
   
   <path id="agentinfo.runtime.module.classpath">
-    <pathelement location="${agentinfo.output.dir}"/>
     <pathelement location="${agentinfo.testoutput.dir}"/>
+    <pathelement location="${agentinfo.output.dir}"/>
     <path refid="library.teamcity_open_api_common.classpath"/>
     <path refid="library.teamcity_third-party.classpath"/>
     <path refid="library.teamcity_open_api_agent.classpath"/>
-    <path refid="library.jniwrapper.classpath"/>
+    <fileset dir="${path.variable.teamcitydistribution}/devPackage/tests">
+      <patternset refid="library.patterns"/>
+    </fileset>
+    <fileset dir="${path.variable.teamcitydistribution}/buildAgent/lib">
+      <patternset refid="library.patterns"/>
+    </fileset>
+    <pathelement location="${basedir}/lib-test/testng-6.8.jar"/>
   </path>
   
   
@@ -130,6 +160,12 @@
     </dirset>
   </path>
   
+  <path id="agentinfo.module.test.sourcepath">
+    <dirset dir="${module.agentinfo.basedir}">
+      <include name="tests"/>
+    </dirset>
+  </path>
+  
   
   <target name="compile.module.agentinfo" depends="compile.module.agentinfo.production,compile.module.agentinfo.tests" description="Compile module AgentInfo"/>
   
@@ -138,7 +174,7 @@
     <javac destdir="${agentinfo.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true">
       <compilerarg line="${compiler.args.agentinfo}"/>
       <bootclasspath refid="agentinfo.module.bootclasspath"/>
-      <classpath refid="agentinfo.module.classpath"/>
+      <classpath refid="agentinfo.module.production.classpath"/>
       <src refid="agentinfo.module.sourcepath"/>
       <patternset refid="excluded.from.compilation.agentinfo"/>
     </javac>
@@ -151,7 +187,23 @@
     </copy>
   </target>
   
-  <target name="compile.module.agentinfo.tests" depends="compile.module.agentinfo.production" description="compile module AgentInfo; test classes" unless="skip.tests"/>
+  <target name="compile.module.agentinfo.tests" depends="compile.module.agentinfo.production" description="compile module AgentInfo; test classes" unless="skip.tests">
+    <mkdir dir="${agentinfo.testoutput.dir}"/>
+    <javac destdir="${agentinfo.testoutput.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true">
+      <compilerarg line="${compiler.args.agentinfo}"/>
+      <bootclasspath refid="agentinfo.module.bootclasspath"/>
+      <classpath refid="agentinfo.module.classpath"/>
+      <src refid="agentinfo.module.test.sourcepath"/>
+      <patternset refid="excluded.from.compilation.agentinfo"/>
+    </javac>
+    
+    <copy todir="${agentinfo.testoutput.dir}">
+      <fileset dir="${module.agentinfo.basedir}/tests">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
   
   <target name="clean.module.agentinfo" description="cleanup module">
     <delete dir="${agentinfo.output.dir}"/>
@@ -164,5 +216,7 @@
   
   <target name="clean" depends="clean.module.agentinfo" description="cleanup all"/>
   
-  <target name="all" depends="init, clean, compile.module.agentinfo" description="build all"/>
+  <target name="build.modules" depends="init, clean, compile.module.agentinfo" description="build all modules"/>
+  
+  <target name="all" depends="build.modules" description="build all"/>
 </project>
