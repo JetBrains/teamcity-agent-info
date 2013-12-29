@@ -10,6 +10,7 @@ import org.testng.annotations.Test;
 @Test
 public class AgentSystemInfoTest extends BaseAgentSpringTestCase {
 
+  // seems like this fails under IBM JDK
   public void testPhysicalMemorySizeMB(){
     AgentSystemInfo agentSystemInfo = new AgentSystemInfo(getBuildAgentConfiguration(), getBuildAgent(), getAgentEvents());
     final Long physicalMemorySizeMB = agentSystemInfo.getPhysicalMemorySizeMB();
