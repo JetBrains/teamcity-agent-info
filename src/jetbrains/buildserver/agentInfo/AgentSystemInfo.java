@@ -17,17 +17,17 @@
 package jetbrains.buildserver.agentInfo;
 
 import com.intellij.openapi.diagnostic.Logger;
-import javax.management.*;
-import jetbrains.buildServer.agent.*;
-import jetbrains.buildServer.util.*;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+import jetbrains.buildServer.agent.*;
+import jetbrains.buildServer.util.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Yegor.Yarko
@@ -111,7 +111,7 @@ public class AgentSystemInfo extends AgentLifeCycleAdapter {
         }
       }
     } catch (Throwable e) {
-      LOG.info("Class 'com.sun.management.OperatingSystemMXBean' not found or another error, using alternative way to get total memory.");
+      LOG.info("Class 'com.sun.management.OperatingSystemMXBean' not found or another error, using alternative way to get total memory. Error encountered: " + e.toString());
       try {
         MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
         Object attribute = mBeanServer.getAttribute(new ObjectName("java.lang","type","OperatingSystem"), "TotalPhysicalMemorySize");
