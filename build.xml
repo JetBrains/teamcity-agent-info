@@ -115,6 +115,7 @@
     <taskdef name="testng" classpathref="tests.runtime.module.classpath" classname="org.testng.TestNGAntTask"/>
     <testng haltonfailure="true">
       <classpath refid="tests.runtime.module.classpath"/>
+      <classpath refid="agentinfo.runtime.module.classpath"/>
       <classfileset dir="${tests.testoutput.dir}" includes="**/*.class" />
     </testng>
   </target>
