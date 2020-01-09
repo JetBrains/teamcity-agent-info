@@ -678,9 +678,6 @@
   <component name="ProjectDetails">
     <option name="projectName" value="AgentInfo" />
   </component>
-  <component name="ProjectKey">
-    <option name="state" value="https://svn.jetbrains.org/teamcity/plugins/agent-info/trunk/AgentInfo.ipr" />
-  </component>
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/AgentInfo.iml" filepath="$PROJECT_DIR$/AgentInfo.iml" />
