@@ -1,1 +1,0 @@
-This plugin is bumndled with TeamCity and these are the sources used for the TeamCity distribution build
