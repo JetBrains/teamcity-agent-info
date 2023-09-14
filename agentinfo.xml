@@ -132,7 +132,14 @@
   
   <path id="library.teamcity_third-party.classpath">
     <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/annotations.jar"/>
+    <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/idea-obsolete-openapi.jar"/>
+    <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/logging.jar"/>
     <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/openapi.jar"/>
+    <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/spring-beans.jar"/>
+    <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/spring-context.jar"/>
+    <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/spring-context-support.jar"/>
+    <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/spring-core.jar"/>
+    <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/spring-web.jar"/>
     <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/spring-webmvc.jar"/>
     <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/spring.jar"/>
     <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/util.jar"/>
